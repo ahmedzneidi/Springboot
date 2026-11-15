@@ -1,0 +1,93 @@
+package tn.esprit.spring.web.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import tn.esprit.spring.domain.Employe;
+import tn.esprit.spring.domain.RoleEmploye;
+import tn.esprit.spring.service.EmployeService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/employes")
+@Tag(name = "Employés", description = "Gestion des employés des agences")
+public class EmployeController {
+
+    private final EmployeService employeService;
+
+    public EmployeController(EmployeService employeService) {
+        this.employeService = employeService;
+    }
+
+    @GetMapping("/test")
+    @Operation(summary = "Tester le contrôleur", description = "Vérifie que le service web Employe répond.")
+    public String testerController() {
+        return "Le contrôleur Employe fonctionne.";
+    }
+
+    @PostMapping
+    @Operation(summary = "Créer un employé")
+    public ResponseEntity<Employe> creer(@RequestBody Employe employe) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeService.creer(employe));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Chercher un employé par identifiant")
+    public Employe obtenirParId(@PathVariable long id) {
+        return employeService.obtenirParId(id);
+    }
+
+    @GetMapping("/listall")
+    @Operation(summary = "Lister les employés")
+    public List<Employe> listerTous() {
+        return employeService.listerTous();
+    }
+
+    @GetMapping("/agence/{idAgence}")
+    @Operation(summary = "Lister les employés d'une agence")
+    public List<Employe> listerParAgence(@PathVariable long idAgence) {
+        return employeService.listerParAgence(idAgence);
+    }
+
+    @GetMapping("/role/{role}")
+    @Operation(summary = "Lister les employés par rôle")
+    public List<Employe> listerParRole(@PathVariable RoleEmploye role) {
+        return employeService.listerParRole(role);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Modifier un employé")
+    public ResponseEntity<Employe> modifier(@PathVariable long id, @RequestBody Employe employe) {
+        return ResponseEntity.ok(employeService.modifier(id, employe));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Supprimer un employé")
+    public ResponseEntity<Void> supprimer(@PathVariable long id) {
+        employeService.supprimer(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{idEmploye}/agence/{idAgence}")
+    @Operation(summary = "Affecter un employé à une agence")
+    public Employe affecterAgence(@PathVariable long idEmploye, @PathVariable long idAgence) {
+        return employeService.affecterAgence(idEmploye, idAgence);
+    }
+
+    @DeleteMapping("/{idEmploye}/agence")
+    @Operation(summary = "Désaffecter un employé de son agence")
+    public Employe desaffecterAgence(@PathVariable long idEmploye) {
+        return employeService.desaffecterAgence(idEmploye);
+    }
+}
