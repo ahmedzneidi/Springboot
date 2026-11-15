@@ -8,17 +8,18 @@ import tn.esprit.spring.domain.Reservation;
 import tn.esprit.spring.repository.ClientRepository;
 import tn.esprit.spring.repository.ReservationRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
-public class ClientService {
+public class ClientServiceImpl implements IClientService {
 
     private final ClientRepository clientRepository;
     private final ReservationRepository reservationRepository;
 
-    public ClientService(ClientRepository clientRepository,
+    public ClientServiceImpl(ClientRepository clientRepository,
                          ReservationRepository reservationRepository) {
         this.clientRepository = clientRepository;
         this.reservationRepository = reservationRepository;
@@ -43,6 +44,22 @@ public class ClientService {
 
     public List<Client> rechercherParNom(String valeur) {
         return clientRepository.findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCase(valeur, valeur);
+    }
+
+    public boolean existeParNumPermis(String numPermis) {
+        return clientRepository.existsByNumPermis(numPermis);
+    }
+
+    public List<Client> listerParDateInscriptionEntre(LocalDate dateDebut, LocalDate dateFin) {
+        return clientRepository.findByDateInscriptionBetween(dateDebut, dateFin);
+    }
+
+    public List<Client> listerParDateInscriptionApres(LocalDate date) {
+        return clientRepository.findByDateInscriptionAfter(date);
+    }
+
+    public long compterParDateInscriptionApres(LocalDate date) {
+        return clientRepository.countByDateInscriptionAfter(date);
     }
 
     public Client modifier(long id, Client client) {

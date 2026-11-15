@@ -10,18 +10,20 @@ import tn.esprit.spring.repository.ContratRepository;
 import tn.esprit.spring.repository.PaiementRepository;
 import tn.esprit.spring.repository.ReservationRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Transactional
-public class ContratService {
+public class ContratServiceImpl implements IContratService {
 
     private final ContratRepository contratRepository;
     private final ReservationRepository reservationRepository;
     private final PaiementRepository paiementRepository;
 
-    public ContratService(ContratRepository contratRepository,
+    public ContratServiceImpl(ContratRepository contratRepository,
                           ReservationRepository reservationRepository,
                           PaiementRepository paiementRepository) {
         this.contratRepository = contratRepository;
@@ -48,6 +50,26 @@ public class ContratService {
 
     public Optional<Contrat> rechercherParReservation(long idReservation) {
         return contratRepository.findByReservationIdReservation(idReservation);
+    }
+
+    public List<Contrat> listerInvalides() {
+        return contratRepository.findByValideFalse();
+    }
+
+    public List<Contrat> listerParDateSignatureEntre(LocalDate dateDebut, LocalDate dateFin) {
+        return contratRepository.findByDateSignatureBetween(dateDebut, dateFin);
+    }
+
+    public List<Contrat> listerParMontantMinimum(BigDecimal montant) {
+        return contratRepository.findByMontantTotalGreaterThanEqual(montant);
+    }
+
+    public long compterValides() {
+        return contratRepository.countByValideTrue();
+    }
+
+    public long compterSignesApres(LocalDate date) {
+        return contratRepository.countByDateSignatureAfter(date);
     }
 
     public Contrat modifier(long id, Contrat contrat) {

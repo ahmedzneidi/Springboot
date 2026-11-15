@@ -28,6 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Contrat {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 

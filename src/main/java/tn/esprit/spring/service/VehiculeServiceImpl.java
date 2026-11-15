@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.spring.domain.Agence;
+import tn.esprit.spring.domain.CategorieVehicule;
 import tn.esprit.spring.domain.Equipement;
 import tn.esprit.spring.domain.StatutVehicule;
 import tn.esprit.spring.domain.Vehicule;
@@ -11,17 +12,18 @@ import tn.esprit.spring.repository.AgenceRepository;
 import tn.esprit.spring.repository.EquipementRepository;
 import tn.esprit.spring.repository.VehiculeRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @Transactional
-public class VehiculeService {
+public class VehiculeServiceImpl implements IVehiculeService {
 
     private final VehiculeRepository vehiculeRepository;
     private final AgenceRepository agenceRepository;
     private final EquipementRepository equipementRepository;
 
-    public VehiculeService(VehiculeRepository vehiculeRepository,
+    public VehiculeServiceImpl(VehiculeRepository vehiculeRepository,
                            AgenceRepository agenceRepository,
                            EquipementRepository equipementRepository) {
         this.vehiculeRepository = vehiculeRepository;
@@ -48,6 +50,48 @@ public class VehiculeService {
 
     public List<Vehicule> listerDisponibles() {
         return vehiculeRepository.findByStatut(StatutVehicule.DISPONIBLE);
+    }
+
+    public Vehicule rechercherParImmatriculation(String immatriculation) {
+        return vehiculeRepository.findByImmatriculationIgnoreCase(immatriculation)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Vehicule introuvable avec l'immatriculation " + immatriculation));
+    }
+
+    public boolean existeParImmatriculation(String immatriculation) {
+        return vehiculeRepository.existsByImmatriculationIgnoreCase(immatriculation);
+    }
+
+    public List<Vehicule> listerParCategorieEtStatut(CategorieVehicule categorie, StatutVehicule statut) {
+        return vehiculeRepository.findByCategorieAndStatut(categorie, statut);
+    }
+
+    public List<Vehicule> rechercherParMarque(String marque) {
+        return vehiculeRepository.findByMarqueContainingIgnoreCase(marque);
+    }
+
+    public List<Vehicule> listerParTarif(BigDecimal tarifMin, BigDecimal tarifMax) {
+        return vehiculeRepository.findByTarifJournalierBetween(tarifMin, tarifMax);
+    }
+
+    public List<Vehicule> listerParVilleEtStatut(String ville, StatutVehicule statut) {
+        return vehiculeRepository.findByAgenceVilleIgnoreCaseAndStatut(ville, statut);
+    }
+
+    public List<Vehicule> listerParEquipement(String libelle) {
+        return vehiculeRepository.findByEquipementsLibelleIgnoreCase(libelle);
+    }
+
+    public List<Vehicule> listerSansEquipement() {
+        return vehiculeRepository.findByEquipementsIsEmpty();
+    }
+
+    public long compterParStatut(StatutVehicule statut) {
+        return vehiculeRepository.countByStatut(statut);
+    }
+
+    public List<Equipement> listerEquipements(long idVehicule) {
+        return obtenirParId(idVehicule).getEquipements();
     }
 
     public Vehicule modifier(long id, Vehicule vehicule) {

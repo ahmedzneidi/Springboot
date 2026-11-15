@@ -15,13 +15,13 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AgenceService {
+public class AgenceServiceImpl implements IAgenceService {
 
     private final AgenceRepository agenceRepository;
     private final EmployeRepository employeRepository;
     private final VehiculeRepository vehiculeRepository;
 
-    public AgenceService(AgenceRepository agenceRepository,
+    public AgenceServiceImpl(AgenceRepository agenceRepository,
                          EmployeRepository employeRepository,
                          VehiculeRepository vehiculeRepository) {
         this.agenceRepository = agenceRepository;
@@ -52,6 +52,18 @@ public class AgenceService {
 
     public long compterParVille(String ville) {
         return agenceRepository.countByVille(ville);
+    }
+
+    public List<Agence> rechercherParNomContenant(String nom) {
+        return agenceRepository.findByNomContainingOrderByVilleAsc(nom);
+    }
+
+    public List<Agence> listerParVilleAvecTelephone(String ville) {
+        return agenceRepository.findByVilleAndTelephoneIsNotNull(ville);
+    }
+
+    public boolean existeParNom(String nom) {
+        return agenceRepository.existsByNomIgnoreCase(nom);
     }
 
     public Agence modifier(long id, Agence agence) {

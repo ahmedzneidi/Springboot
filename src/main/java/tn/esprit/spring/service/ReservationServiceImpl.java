@@ -11,17 +11,18 @@ import tn.esprit.spring.repository.ClientRepository;
 import tn.esprit.spring.repository.ReservationRepository;
 import tn.esprit.spring.repository.VehiculeRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @Transactional
-public class ReservationService {
+public class ReservationServiceImpl implements IReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ClientRepository clientRepository;
     private final VehiculeRepository vehiculeRepository;
 
-    public ReservationService(ReservationRepository reservationRepository,
+    public ReservationServiceImpl(ReservationRepository reservationRepository,
                               ClientRepository clientRepository,
                               VehiculeRepository vehiculeRepository) {
         this.reservationRepository = reservationRepository;
@@ -52,6 +53,32 @@ public class ReservationService {
 
     public List<Reservation> listerParStatut(StatutReservation statut) {
         return reservationRepository.findByStatut(statut);
+    }
+
+    public List<Reservation> listerParClientEtStatut(long idClient, StatutReservation statut) {
+        return reservationRepository.findByClientIdClientAndStatut(idClient, statut);
+    }
+
+    public List<Reservation> listerParDateDebutEntre(LocalDate dateDebut, LocalDate dateFin) {
+        return reservationRepository.findByDateDebutBetween(dateDebut, dateFin);
+    }
+
+    public List<Reservation> listerTermineesAvant(LocalDate date) {
+        return reservationRepository.findByDateFinBefore(date);
+    }
+
+    public boolean existeActivePourVehicule(long idVehicule) {
+        return reservationRepository.existsByVehiculeIdVehiculeAndStatut(idVehicule, StatutReservation.CONFIRMEE);
+    }
+
+    public Reservation rechercherParContrat(long idContrat) {
+        return reservationRepository.findByContratIdContrat(idContrat)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Reservation introuvable pour le contrat " + idContrat));
+    }
+
+    public long compterParStatut(StatutReservation statut) {
+        return reservationRepository.countByStatut(statut);
     }
 
     public Reservation modifier(long id, Reservation reservation) {

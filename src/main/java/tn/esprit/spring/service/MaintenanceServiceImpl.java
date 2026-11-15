@@ -9,16 +9,17 @@ import tn.esprit.spring.repository.MaintenanceRepository;
 import tn.esprit.spring.repository.VehiculeRepository;
 import tn.esprit.spring.web.dto.MaintenanceRequest;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @Transactional
-public class MaintenanceService {
+public class MaintenanceServiceImpl implements IMaintenanceService {
 
     private final MaintenanceRepository maintenanceRepository;
     private final VehiculeRepository vehiculeRepository;
 
-    public MaintenanceService(MaintenanceRepository maintenanceRepository,
+    public MaintenanceServiceImpl(MaintenanceRepository maintenanceRepository,
                               VehiculeRepository vehiculeRepository) {
         this.maintenanceRepository = maintenanceRepository;
         this.vehiculeRepository = vehiculeRepository;
@@ -31,12 +32,7 @@ public class MaintenanceService {
         Vehicule vehicule = vehiculeRepository.findById(request.idVehicule())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Véhicule introuvable avec l'identifiant " + request.idVehicule()));
-        Maintenance maintenance = new Maintenance();
-        maintenance.setDateDebut(request.dateDebut());
-        maintenance.setDateFin(request.dateFin());
-        maintenance.setDescription(request.description());
-        maintenance.setVehicule(vehicule);
-        return maintenanceRepository.save(maintenance);
+        return maintenanceRepository.save(request.toEntity(vehicule));
     }
 
     public Maintenance obtenirParId(long id) {
@@ -56,11 +52,39 @@ public class MaintenanceService {
         return maintenanceRepository.findByDateFinIsNull();
     }
 
+    public List<Maintenance> listerParImmatriculation(String immatriculation) {
+        return maintenanceRepository.findByVehiculeImmatriculationIgnoreCase(immatriculation);
+    }
+
+    public List<Maintenance> listerParDateDebutEntre(LocalDate dateDebut, LocalDate dateFin) {
+        return maintenanceRepository.findByDateDebutBetween(dateDebut, dateFin);
+    }
+
+    public List<Maintenance> listerTerminees() {
+        return maintenanceRepository.findByDateFinIsNotNull();
+    }
+
+    public long compterParVehicule(long idVehicule) {
+        return maintenanceRepository.countByVehiculeIdVehicule(idVehicule);
+    }
+
     public Maintenance modifier(long id, Maintenance maintenance) {
         Maintenance existante = obtenirParId(id);
         existante.setDateDebut(maintenance.getDateDebut());
         existante.setDateFin(maintenance.getDateFin());
         existante.setDescription(maintenance.getDescription());
+        return maintenanceRepository.save(existante);
+    }
+
+    public Maintenance modifier(long id, MaintenanceRequest request) {
+        Maintenance existante = obtenirParId(id);
+        Vehicule vehicule = vehiculeRepository.findById(request.idVehicule())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Véhicule introuvable avec l'identifiant " + request.idVehicule()));
+        existante.setDateDebut(request.dateDebut());
+        existante.setDateFin(request.dateFin());
+        existante.setDescription(request.description());
+        existante.setVehicule(vehicule);
         return maintenanceRepository.save(existante);
     }
 

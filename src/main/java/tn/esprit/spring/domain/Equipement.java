@@ -23,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Equipement {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 

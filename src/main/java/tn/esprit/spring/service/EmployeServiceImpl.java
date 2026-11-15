@@ -13,12 +13,12 @@ import java.util.List;
 
 @Service
 @Transactional
-public class EmployeService {
+public class EmployeServiceImpl implements IEmployeService {
 
     private final EmployeRepository employeRepository;
     private final AgenceRepository agenceRepository;
 
-    public EmployeService(EmployeRepository employeRepository,
+    public EmployeServiceImpl(EmployeRepository employeRepository,
                           AgenceRepository agenceRepository) {
         this.employeRepository = employeRepository;
         this.agenceRepository = agenceRepository;
@@ -47,6 +47,20 @@ public class EmployeService {
 
     public List<Employe> rechercherParNom(String valeur) {
         return employeRepository.findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCase(valeur, valeur);
+    }
+
+    public Employe rechercherParNomEtPrenom(String nom, String prenom) {
+        return employeRepository.findByNomIgnoreCaseAndPrenomIgnoreCase(nom, prenom)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Employé introuvable avec le nom " + nom + " et le prénom " + prenom));
+    }
+
+    public boolean existeParNomEtPrenom(String nom, String prenom) {
+        return employeRepository.existsByNomIgnoreCaseAndPrenomIgnoreCase(nom, prenom);
+    }
+
+    public long compterParAgence(long idAgence) {
+        return employeRepository.countByAgenceIdAgence(idAgence);
     }
 
     public Employe modifier(long id, Employe employe) {

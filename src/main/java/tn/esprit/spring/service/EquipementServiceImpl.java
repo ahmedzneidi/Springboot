@@ -11,11 +11,11 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class EquipementService {
+public class EquipementServiceImpl implements IEquipementService {
 
     private final EquipementRepository equipementRepository;
 
-    public EquipementService(EquipementRepository equipementRepository) {
+    public EquipementServiceImpl(EquipementRepository equipementRepository) {
         this.equipementRepository = equipementRepository;
     }
 
@@ -34,6 +34,14 @@ public class EquipementService {
 
     public Optional<Equipement> rechercherParLibelle(String libelle) {
         return equipementRepository.findByLibelleIgnoreCase(libelle);
+    }
+
+    public List<Equipement> rechercherParLibelleContenant(String libelle) {
+        return equipementRepository.findByLibelleContainingIgnoreCase(libelle);
+    }
+
+    public boolean existeParLibelle(String libelle) {
+        return equipementRepository.existsByLibelleIgnoreCase(libelle);
     }
 
     public List<Equipement> listerParVehicule(long idVehicule) {

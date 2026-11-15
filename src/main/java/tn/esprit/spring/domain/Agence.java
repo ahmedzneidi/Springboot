@@ -22,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Agence {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 

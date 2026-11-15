@@ -24,6 +24,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Maintenance {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 

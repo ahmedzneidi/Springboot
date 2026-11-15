@@ -26,6 +26,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Reservation {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
