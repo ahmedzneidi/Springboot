@@ -43,4 +43,6 @@ public interface IReservationService {
     Reservation affecterVehicule(long idReservation, long idVehicule);
 
     Reservation desaffecterVehicule(long idReservation);
+
+    void verifierReservationExpirees();
 }

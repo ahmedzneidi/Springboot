@@ -22,6 +22,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByDateFinBefore(LocalDate date);
 
+    List<Reservation> findByStatutAndDateFinBefore(StatutReservation statut, LocalDate date);
+
     boolean existsByVehiculeIdVehiculeAndStatut(Long idVehicule, StatutReservation statut);
 
     Optional<Reservation> findByContratIdContrat(Long idContrat);

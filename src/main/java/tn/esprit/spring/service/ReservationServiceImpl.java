@@ -1,6 +1,7 @@
 package tn.esprit.spring.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.spring.domain.Client;
@@ -120,5 +121,17 @@ public class ReservationServiceImpl implements IReservationService {
         Reservation reservation = obtenirParId(idReservation);
         reservation.setVehicule(null);
         return reservationRepository.save(reservation);
+    }
+
+    @Scheduled(cron = "0 1 0 * * *")
+    @Override
+    public void verifierReservationExpirees() {
+        LocalDate today = LocalDate.now();
+        List<Reservation> reservations =
+                reservationRepository.findByStatutAndDateFinBefore(StatutReservation.CONFIRMEE, today);
+        for (Reservation reservation : reservations) {
+            reservation.setStatut(StatutReservation.TERMINEE);
+        }
+        reservationRepository.saveAll(reservations);
     }
 }
